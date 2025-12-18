@@ -6,7 +6,7 @@ setuptools.setup(
     author="Andrea Liosi",
     author_email="andrea.liosi@gmail.com",
     description="A simple API library for the Visonic/Bentel/Tyco Alarm system.",
-    url="https://github.com/And3rsL/VisonicAlarm2",
+    url="https://github.com/andreavecchia73/VisonicAlarm2",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
