@@ -264,7 +264,7 @@ def connect(self):
             _LOGGER.info('Visonics Rest API version 8.0 is supported.')
             self.__api.setVersionUrls('8.0')
         else:
-            raise Exception(f'Visonics Rest API versions 8.0 to 14.0 are not supported by server. Supported versions: {", ".join(rest_versions)}')
+            raise Exception('Visonics Rest API versions 8.0 to 14.0 are not supported by server. Supported versions: {", ".join(rest_versions)}')
 
 
         # Try to login and get a user token.
