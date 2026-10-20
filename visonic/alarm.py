@@ -241,29 +241,22 @@ class System(object):
     def connect(self):
         """ Connect to the alarm system and get the static system info. """
 
-        # Check that the server support API version 4.0 or 8.0.
-        rest_versions = self.__api.get_version_info()['rest_versions']
-
-        if '8.0' in rest_versions:
-            _LOGGER.info('Visonics Rest API version 8.0 is supported.')
-            self.__api.setVersionUrls('8.0')
-        elif '14.0' in rest_versions:
-            _LOGGER.info('Visonics Rest API version 12.0 is supported.')
-            self.__api.setVersionUrls('14.0')
-        elif '9.0' in rest_versions:
-            _LOGGER.info('Visonics Rest API version 9.0 is supported.')
-            self.__api.setVersionUrls('9.0')
-        elif '10.0' in rest_versions:
-            _LOGGER.info('Visonics Rest API version 10.0 is supported.')
-        elif '12.0' in rest_versions:
-            _LOGGER.info('Visonics Rest API version 12.0 is supported.')
-            self.__api.setVersionUrls('12.0')
-        elif '13.0' in rest_versions:
-            _LOGGER.info('Visonics Rest API version 13.0 is supported.')
-            self.__api.setVersionUrls('13.0')
-        else:
-            raise Exception(f'Visonics Rest API versions 8.0, 9.0, 10.0, 12.0, 14.0 or 13.0 are not supported by server. Supported versions: {", ".join(rest_versions)}')
-
+        # Check that the server support API version 8.0 or higher.
+        rest_versions = self.__api.get_version_info()['rest_versions'][0]
+        
+        # Convert version string to float for comparison
+        try:
+            version_number = float(rest_versions)
+            if version_number < 8.0:
+                raise ValueError(f'API version {rest_versions} not supported. Minimum required version: 8.0')
+        except (ValueError, TypeError) as e:
+            if 'non supported' in str(e):
+                raise
+            raise ValueError(f'API version not valid: {rest_versions}')
+    
+        self.__api.setVersionUrls(rest_versions)
+        
+        logging.debug('Supported REST API versions: {0}'.format(rest_versions))
 
         # Try to login and get a user token.
         self.__api.login()
@@ -434,7 +427,7 @@ class System(object):
         for device in devices:
             if device is not None:
                 if device['subtype'] is not None:
-                    if 'CONTACT' in device['subtype']:
+                    if 'CONTACT' in device['subtype'] or '_MC_' in device['subtype']:
                         contact_device = ContactDevice(
                             id=device['id'],
                             name=device['name'],
